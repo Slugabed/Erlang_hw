@@ -1,0 +1,3 @@
+-type banknote() :: {integer(), integer()}.
+-record(banknote, {amount = 0 :: integer(), value = 0 :: integer()}).
+-type banknotes() :: [#banknote{}].
