@@ -18,28 +18,15 @@ withdraw(_CollectedBanknotes, [], _Amount, StartSet) ->
 	{request_another_amount, [], StartSet};
 
 withdraw(CollectedBanknotes, RestToSearch, Amount, StartSet) ->
-	%% How to avoid general code?
-	case RestToSearch of
-		[{DenominationAmount, Value}] ->
-			DesirableAmount = Amount div Value,
-			if
-				DesirableAmount > DenominationAmount ->
-					TakenAmount = DenominationAmount;
-				true ->
-					TakenAmount = DesirableAmount
-			end,
-			withdraw([#banknote{amount = TakenAmount, value =Value} | CollectedBanknotes], [], Amount - TakenAmount * Value, StartSet);
-
-		[{DenominationAmount, Value} | Tl] ->
-			DesirableAmount = Amount div Value,
-			if
-				DesirableAmount > DenominationAmount ->
-					TakenAmount = DenominationAmount;
-				true ->
-					TakenAmount = DesirableAmount
-			end,
-			withdraw([#banknote{amount = TakenAmount, value =Value} | CollectedBanknotes], Tl, Amount - TakenAmount * Value, StartSet)	
-	end.
+		[{DenominationAmount, Value} | Tl] = RestToSearch,
+		DesirableAmount = Amount div Value,
+		if
+			DesirableAmount > DenominationAmount ->
+				TakenAmount = DenominationAmount;
+			true ->
+				TakenAmount = DesirableAmount
+		end,
+		withdraw([#banknote{amount = TakenAmount, value =Value} | CollectedBanknotes], Tl, Amount - TakenAmount * Value, StartSet).
 
 %% find intersection by iterating by first function list argument
 %%intersection(A, B) ->
