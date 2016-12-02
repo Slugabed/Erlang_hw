@@ -9,7 +9,7 @@
 -spec withdraw([banknotes()], integer) -> {ok, banknotes(), banknotes()} | {request_another_amount, [], [banknotes()]}.
 
 withdraw(Banknotes, Amount) ->
-	withdraw([], Banknotes, Amount, Banknotes).
+	withdraw([], lists:reverse(lists:sort(Banknotes)), Amount, Banknotes).
 
 withdraw(CollectedBanknotes, _RestBanknote, 0, StartSet) ->
 	{ok, CollectedBanknotes, get_rest(CollectedBanknotes, StartSet)};
@@ -18,7 +18,7 @@ withdraw(_CollectedBanknotes, [], _Amount, StartSet) ->
 	{request_another_amount, [], StartSet};
 
 withdraw(CollectedBanknotes, RestToSearch, Amount, StartSet) ->
-		[{DenominationAmount, Value} | Tl] = RestToSearch,
+		[{Value, DenominationAmount} | Tl] = RestToSearch,
 		DesirableAmount = Amount div Value,
 		if
 			DesirableAmount > DenominationAmount ->
@@ -26,7 +26,7 @@ withdraw(CollectedBanknotes, RestToSearch, Amount, StartSet) ->
 			true ->
 				TakenAmount = DesirableAmount
 		end,
-		withdraw([{TakenAmount, Value} | CollectedBanknotes], Tl, Amount - TakenAmount * Value, StartSet).
+		withdraw([{Value, TakenAmount} | CollectedBanknotes], Tl, Amount - TakenAmount * Value, StartSet).
 
 %% find intersection by iterating by first function list argument
 %%intersection(A, B) ->
@@ -46,13 +46,13 @@ get_rest(Subtrahend, Minuend) ->
 get_rest([], Minuend, Result) ->
 	lists:sort(Result ++ Minuend);
 
-get_rest([{DenominationAmount, Value}|Tl], Minuend, Result) ->
+get_rest([{Value, DenominationAmount}|Tl], Minuend, Result) ->
 	[Extracted] = extract_denomination(Minuend, Value),
-	{ExtractedAmount, _ExtractedValue} = Extracted,
-	get_rest(Tl, Minuend -- [Extracted], [{ExtractedAmount - DenominationAmount, Value} | Result]).
+	{_ExtractedValue, ExtractedAmount} = Extracted,
+	get_rest(Tl, Minuend -- [Extracted], [{Value, ExtractedAmount - DenominationAmount} | Result]).
 
 extract_denomination(List, RequiredDenomination) ->
-	lists:filtermap(fun({_DenominationAmount, Value}) -> 
+	lists:filtermap(fun({Value, _DenominationAmount}) -> 
 			RequiredDenomination == Value end
 			, List).
 get_element_by_index([Hd|Tl], Index) when Index >= 0 ->
