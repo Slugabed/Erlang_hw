@@ -9,7 +9,7 @@ terminate(Reason, State) ->
 	io:format("Servere terminated with state and reason: ~p, ~p~n", [State, Reason]),
 	ok.
 
-handle_call(Amount, _From, Banknotes) ->
+handle_call({withdraw, Amount}, _From, Banknotes) ->
 	try awt:withdraw(Banknotes, Amount) of
 		{ok, CollectedBanknotes, RestBanknotes} ->
 			{reply,CollectedBanknotes,RestBanknotes};
