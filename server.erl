@@ -4,6 +4,6 @@
 
 -define(SERVER, awt_server).
 
-start(StartSet) -> gen_server:start_link({local, ?SERVER}, callback_awt, [StartSet], []).
-withdraw(Banknotes, AMount) -> gen_server:call(?SERVER, {Banknotes, Amount}).
+start(StartSet) -> gen_server:start_link({local, ?SERVER}, callback_awt, StartSet, []).
+withdraw(Amount) -> gen_server:call(?SERVER, Amount).
 stop()  -> gen_server:stop(?SERVER).
